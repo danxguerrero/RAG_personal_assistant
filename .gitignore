@@ -1,0 +1,5 @@
+# Ignore Streamlit secrets
+.streamlit/secrets.toml
+
+# Ignore virtual env
+venv/
