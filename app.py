@@ -1,8 +1,9 @@
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 api_key = st.secrets["GOOGLE_API_KEY"]
-
+text = ""
 
 # Upload txt files and shows a preview if loaded successfully
 uploaded_file = st.file_uploader("Upload a .txt file", type=["txt"])
@@ -18,6 +19,12 @@ text_splitter = RecursiveCharacterTextSplitter(
     chunk_overlap=50
 )
 
-chunks = text_splitter.split_text(text)
-st.write(f"Text successfully chunked: {chunks}")
+if len(text) > 0:
+    chunks = text_splitter.split_text(text)
+
+# Create embeddings with Gemini
+embeddings= GoogleGenerativeAIEmbeddings(
+    model="models/embedding-001",
+    api_key=api_key
+)
 
