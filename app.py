@@ -1,6 +1,7 @@
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_chroma import Chroma
 
 api_key = st.secrets["GOOGLE_API_KEY"]
 text = ""
@@ -26,5 +27,12 @@ if len(text) > 0:
 embeddings= GoogleGenerativeAIEmbeddings(
     model="models/embedding-001",
     api_key=api_key
+)
+
+# Create a persisten chroma database
+chroma_db = Chroma(
+    collection_name="personal_docs",
+    embedding_function=embeddings,
+    persist_directory=".chroma_db"
 )
 

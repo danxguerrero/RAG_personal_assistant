@@ -3,3 +3,6 @@
 
 # Ignore virtual env
 venv/
+
+# Ignore chroma db
+.chroma_db/
