@@ -1,27 +1,19 @@
 import streamlit as st
+import os
+from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 
 api_key = st.secrets["GOOGLE_API_KEY"]
+
+
+st.title("Personal RAG Assitant")
+st.write("Upload a '.txt' or a '.pdf' file and I'll remember them for you.")
 text = ""
 
-# Upload txt files and shows a preview if loaded successfully
-uploaded_file = st.file_uploader("Upload a .txt file", type=["txt"])
-
-if uploaded_file:
-    text = uploaded_file.read().decode('utf-8')
-    st.write("File uploaded successfully! Preview:")
-    st.write(f"{text[:500]}...")
-
-# Chunk the txt file contents using langchain
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=50
-)
-
-if len(text) > 0:
-    chunks = text_splitter.split_text(text)
+# Upload txt and pdf files and shows a preview if loaded successfully
+uploaded_file = st.file_uploader("Upload a .txt or .pdf file", type=["txt", "pdf"])
 
 # Create embeddings with Gemini
 embeddings= GoogleGenerativeAIEmbeddings(
@@ -35,4 +27,25 @@ chroma_db = Chroma(
     embedding_function=embeddings,
     persist_directory=".chroma_db"
 )
+
+
+if uploaded_file:
+    st.write(f"Processing: {uploaded_file.name}")
+
+
+    # Handle PDF uploads
+    if uploaded_file.type == "application/pdf":
+        pdf = PdfReader(uploaded_file)
+        for page in pdf.pages:
+            extracted = page.extract_text()
+            if extracted:
+                text += extracted
+
+    # Handl TXT uploads
+    elif uploaded_file.type == "text/plain":
+        text = uploaded_file.read().decode('utf-8')
+    
+    st.write("File uploaded successfully! Preview:")
+    st.write(f"{text[:500]}...")
+
 
