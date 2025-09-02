@@ -48,4 +48,18 @@ if uploaded_file:
     st.write("File uploaded successfully! Preview:")
     st.write(f"{text[:500]}...")
 
+    # Chunk the file's text content using langchain
+    if text.strip():
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=500,
+            chunk_overlap=50
+        )
 
+        chunks = text_splitter.split_text(text)
+
+
+        chroma_db.add_texts(chunks)
+        st.success("Chunked and stored in Chroma!")
+    else:
+        st.warning("No text could be extracted from this file.")
+    
