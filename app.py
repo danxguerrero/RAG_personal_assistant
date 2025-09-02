@@ -62,4 +62,16 @@ if uploaded_file:
         st.success("Chunked and stored in Chroma!")
     else:
         st.warning("No text could be extracted from this file.")
-    
+
+# If we don't have messages for our session, initialize an empty list
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Loop through each message and display them in the chat
+for msg in st.session_state.messages:
+    role = msg["role"]
+    st.chat_message(role).write(msg["content"])
+
+if prompt := st.chat_input("Ask me something..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    st.chat_message("user").write(prompt)
