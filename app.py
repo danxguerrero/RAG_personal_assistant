@@ -75,3 +75,8 @@ for msg in st.session_state.messages:
 if prompt := st.chat_input("Ask me something..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
+
+    # Harcoded for now
+    reply = "This is a placeholder reply."
+    st.session_state.messages.append({"role": "assistant", "content": reply})
+    st.chat_message("assitant").write(reply)
