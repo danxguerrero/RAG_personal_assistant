@@ -82,13 +82,24 @@ if prompt := st.chat_input("Ask me something..."):
     docs = chroma_db.similarity_search(prompt, k=3)
     context = "\n\n".join([d.page_content for d in docs])
 
+    # Handle when no docs are found
+    with st.expander("Debug: Retrieved Context"):
+        st.write(context if context else "No context found.")
+
     # Build Gemini prompt
     system_instruction = "You are a helpful assistant. Use the provided context to answer the question."
     full_prompt = f"{system_instruction}\n\nContext:\n{context}\n\nUser Question: {prompt}"
 
+     # Debugging: Show Gemini prompt
+    with st.expander("Debug: Prompt sent to Gemini"):
+        st.write(full_prompt)
+
     # Get Gemini response
-    response = model.generate_content(full_prompt)
-    reply = response.text
+    try:
+        response = model.generate_content(full_prompt)
+        reply = response.text
+    except Exception as e:
+        reply = f"Error from Gemini: {e}"
 
     # Save + display assistant message
     st.session_state.messages.append({"role": "assistant", "content": reply})
