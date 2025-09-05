@@ -1,11 +1,13 @@
 import streamlit as st
-import os
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
+import google.generativeai as genai
 
 api_key = st.secrets["GOOGLE_API_KEY"]
+genai.configure(api_key=api_key)
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 
 st.title("Personal RAG Assitant")
@@ -75,8 +77,19 @@ for msg in st.session_state.messages:
 if prompt := st.chat_input("Ask me something..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
+    
+    # Retrieve relevant docs
+    docs = chroma_db.similarity_search(prompt, k=3)
+    context = "\n\n".join([d.page_content for d in docs])
 
-    # Harcoded for now
-    reply = "This is a placeholder reply."
+    # Build Gemini prompt
+    system_instruction = "You are a helpful assistant. Use the provided context to answer the question."
+    full_prompt = f"{system_instruction}\n\nContext:\n{context}\n\nUser Question: {prompt}"
+
+    # Get Gemini response
+    response = model.generate_content(full_prompt)
+    reply = response.text
+
+    # Save + display assistant message
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.chat_message("assitant").write(reply)
