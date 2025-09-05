@@ -87,7 +87,7 @@ if prompt := st.chat_input("Ask me something..."):
         st.write(context if context else "No context found.")
 
     # Build Gemini prompt
-    system_instruction = "You are a helpful assistant. Use the provided context to answer the question."
+    system_instruction = "You are a helpful assistant. Use the provided context to answer the question. If you don't know the answer, say 'I don't know'."
     full_prompt = f"{system_instruction}\n\nContext:\n{context}\n\nUser Question: {prompt}"
 
      # Debugging: Show Gemini prompt
