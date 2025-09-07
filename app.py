@@ -64,8 +64,15 @@ if uploaded_file:
 
         chunks = text_splitter.split_text(text)
 
+        metadatas = []
+        for i, chunk in enumerate(chunks):
+            metadatas.append({
+                "source": uploaded_file.name,
+                "chunk": i
+            })
 
-        chroma_db.add_texts(chunks)
+
+        chroma_db.add_texts(chunks, metadatas=metadatas)
         st.success("Chunked and stored in Chroma!")
     else:
         st.warning("No text could be extracted from this file.")
