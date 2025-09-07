@@ -95,12 +95,20 @@ if prompt := st.chat_input("Ask me something..."):
         st.write(full_prompt)
 
     # Get Gemini response
-    try:
-        response = model.generate_content(full_prompt)
-        reply = response.text
-    except Exception as e:
-        reply = f"Error from Gemini: {e}"
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_reply = ""
+
+        try:
+            response = model.generate_content(full_prompt, stream=True)
+            for chunk in response:
+                if chunk.text:
+                    full_reply += chunk.text
+                    message_placeholder.markdown(full_reply + "▌")
+            message_placeholder.markdown(full_reply)
+        except Exception as e:
+            reply = f"Error from Gemini: {e}"
+            message_placeholder.markdown(reply)
 
     # Save + display assistant message
-    st.session_state.messages.append({"role": "assistant", "content": reply})
-    st.chat_message("assitant").write(reply)
+    st.session_state.messages.append({"role": "assistant", "content": full_reply})
