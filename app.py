@@ -17,7 +17,7 @@ text = ""
 # Clears the chat history
 if st.button("Clear Chat"):
     st.session_state.messages = []
-    st.experimental_rerun()
+    st.rerun()
 
 # Upload txt and pdf files and shows a preview if loaded successfully
 uploaded_file = st.file_uploader("Upload a .txt or .pdf file", type=["txt", "pdf"])
@@ -34,6 +34,24 @@ chroma_db = Chroma(
     embedding_function=embeddings,
     persist_directory=".chroma_db"
 )
+
+st.sidebar.header("Stored Files")
+
+try:
+    collections = chroma_db.get(include=["metadatas"])
+    metadatas = collections.get("metadatas", [])
+
+    if metadatas:
+        sources = {m.get("source") for m in metadatas if m and "source" in m}
+        if sources:
+            for source in sources:
+                st.sidebar.write(f"- {source}")
+        else:
+            st.sidebar.write("No files stored yet.")
+    else:
+        st.sidebar.write("No files stored yet.")
+except Exception as e:
+    st.sidebar.write(f"Error retrieving file list: {e}")
 
 
 if uploaded_file:
