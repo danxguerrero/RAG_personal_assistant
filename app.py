@@ -14,6 +14,11 @@ st.title("Personal RAG Assitant")
 st.write("Upload a '.txt' or a '.pdf' file and I'll remember them for you.")
 text = ""
 
+# Clears the chat history
+if st.button("Clear Chat"):
+    st.session_state.messages = []
+    st.experimental_rerun()
+
 # Upload txt and pdf files and shows a preview if loaded successfully
 uploaded_file = st.file_uploader("Upload a .txt or .pdf file", type=["txt", "pdf"])
 
