@@ -112,6 +112,9 @@ if prompt := st.chat_input("Ask me something..."):
     docs = chroma_db.similarity_search(prompt, k=3)
     context = "\n\n".join([d.page_content for d in docs])
 
+    # Collect unique sources for citation
+    sources = {doc.metadata["source"] for doc in docs if "source" in doc.metadata}
+
     # Handle when no docs are found
     with st.expander("Debug: Retrieved Context"):
         st.write(context if context else "No context found.")
@@ -142,3 +145,7 @@ if prompt := st.chat_input("Ask me something..."):
 
     # Save + display assistant message
     st.session_state.messages.append({"role": "assistant", "content": full_reply})
+
+    # Display sources under the message
+    if sources:
+        st.markdown(f"**Sources:** {', '.join(sources)}")
